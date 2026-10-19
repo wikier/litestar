@@ -2,6 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from litestar.exceptions import MissingDependencyException
+
+# Before the submodules, which import pydantic directly. The package is always initialised first, so this covers every
+# import path, and the app can skip its default pydantic plugins when pydantic isn't installed.
+try:
+    import pydantic  # noqa: F401
+except ImportError as e:
+    raise MissingDependencyException("pydantic") from e
+
 from litestar.plugins import InitPlugin
 from litestar.plugins.pydantic.dto import PydanticDTO
 from litestar.plugins.pydantic.plugins.di import PydanticDIPlugin
